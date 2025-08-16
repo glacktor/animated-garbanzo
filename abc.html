@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Chart Demo</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <canvas id="chart"></canvas>
+  <script>
+    // Даем понять, что WebApp готов
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+
+    const ctx = document.getElementById('chart');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Янв', 'Фев', 'Мар'],
+        datasets: [{
+          label: 'Продажи',
+          data: [3, 7, 4]
+        }]
+      }
+    });
+  </script>
+</body>
+</html>
