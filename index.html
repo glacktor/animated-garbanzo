@@ -1,36 +1,304 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <title>TradingView Chart</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTC Trading</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tradingview-charting-library/1.0.0/charting_library.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #0d1421;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .chart-section {
+            flex: 1;
+            position: relative;
+        }
+        
+        .trading-panel {
+            width: 300px;
+            background: #1e2329;
+            border-left: 1px solid #2b3139;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btc-icon {
+            width: 24px;
+            height: 24px;
+            background: #f7931a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: white;
+        }
+        
+        .price-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #02c076;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .input-group label {
+            font-size: 12px;
+            color: #848e9c;
+            text-transform: uppercase;
+        }
+        
+        .input-field {
+            background: #2b3139;
+            border: 1px solid #2b3139;
+            color: #fff;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .input-field:focus {
+            border-color: #f0b90b;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .trade-button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            text-transform: uppercase;
+        }
+        
+        .buy-button {
+            background: #02c076;
+            color: white;
+        }
+        
+        .sell-button {
+            background: #f84960;
+            color: white;
+        }
+        
+        .trade-button:hover {
+            opacity: 0.8;
+        }
+        
+        .trade-button:active {
+            transform: translateY(1px);
+        }
+        
+        #tradingview_chart {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .market-info {
+            background: #2b3139;
+            border-radius: 4px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 12px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .info-label {
+            color: #848e9c;
+        }
+        
+        .info-value {
+            color: #fff;
+            font-weight: 500;
+        }
+    </style>
 </head>
-<body style="margin:0;padding:0;">
-  <!-- TradingView Widget BEGIN -->
-  <div class="tradingview-widget-container">
-    <div id="tradingview_chart"></div>
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <script type="text/javascript">
-      Telegram.WebApp.ready();
-      Telegram.WebApp.expand();
+<body>
+    <div class="container">
+        <div class="chart-section">
+            <div id="tradingview_widget"></div>
+        </div>
+        
+        <div class="trading-panel">
+            <div class="header">
+                <div class="btc-icon">₿</div>
+                <div>
+                    <h2>BTC/USDT</h2>
+                    <div class="price-display" id="currentPrice">$43,250.00</div>
+                </div>
+            </div>
+            
+            <div class="market-info">
+                <div class="info-item">
+                    <span class="info-label">24h изменение</span>
+                    <span class="info-value" style="color: #02c076;">+2.45%</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">24h объем</span>
+                    <span class="info-value">1.2B</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Максимум 24h</span>
+                    <span class="info-value">$43,890</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Минимум 24h</span>
+                    <span class="info-value">$42,100</span>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>Маржа (USDT)</label>
+                <input type="number" class="input-field" id="marginInput" placeholder="0.00" step="0.01" min="0">
+            </div>
+            
+            <div class="input-group">
+                <label>Цена (USDT)</label>
+                <input type="number" class="input-field" id="priceInput" placeholder="43250.00" step="0.01" min="0">
+            </div>
+            
+            <div class="button-group">
+                <button class="trade-button buy-button" id="buyButton">Купить</button>
+                <button class="trade-button sell-button" id="sellButton">Продать</button>
+            </div>
+        </div>
+    </div>
 
-      new TradingView.widget({
-        "container_id": "tradingview_chart",
-        "width": "100%",
-        "height": "100%",
-        "symbol": "BINANCE:BTCUSDT",   // Тут меняешь на нужный символ
-        "interval": "60",
-        "timezone": "Etc/UTC",
-        "theme": "dark",
-        "style": "1",
-        "locale": "ru",
-        "toolbar_bg": "#f1f3f6",
-        "enable_publishing": false,
-        "hide_legend": false,
-        "save_image": false
-      });
+    <script>
+        // TradingView Widget
+        new TradingView.widget({
+            "width": "100%",
+            "height": "100%",
+            "symbol": "BINANCE:BTCUSDT",
+            "interval": "15",
+            "timezone": "Europe/Moscow",
+            "theme": "dark",
+            "style": "1",
+            "locale": "ru",
+            "toolbar_bg": "#0d1421",
+            "enable_publishing": false,
+            "hide_top_toolbar": false,
+            "hide_legend": true,
+            "save_image": false,
+            "container_id": "tradingview_widget",
+            "studies": [
+                "Volume@tv-basicstudies"
+            ],
+            "overrides": {
+                "paneProperties.background": "#0d1421",
+                "paneProperties.backgroundType": "solid"
+            }
+        });
+
+        // Trading logic
+        const marginInput = document.getElementById('marginInput');
+        const priceInput = document.getElementById('priceInput');
+        const buyButton = document.getElementById('buyButton');
+        const sellButton = document.getElementById('sellButton');
+        const currentPrice = document.getElementById('currentPrice');
+
+        // Simulate price updates
+        let basePrice = 43250;
+        function updatePrice() {
+            const change = (Math.random() - 0.5) * 100;
+            basePrice += change;
+            currentPrice.textContent = `$${basePrice.toFixed(2)}`;
+            priceInput.placeholder = basePrice.toFixed(2);
+        }
+
+        setInterval(updatePrice, 2000);
+
+        // Trading functions
+        function executeTrade(type) {
+            const margin = parseFloat(marginInput.value);
+            const price = parseFloat(priceInput.value) || basePrice;
+            
+            if (!margin || margin <= 0) {
+                alert('Введите корректную маржу');
+                return;
+            }
+
+            const quantity = margin / price;
+            
+            // Here you would integrate with your DEX backend
+            console.log(`${type} order:`, {
+                symbol: 'BTCUSDT',
+                margin: margin,
+                price: price,
+                quantity: quantity.toFixed(8)
+            });
+            
+            alert(`${type} ордер на ${quantity.toFixed(6)} BTC по цене $${price.toFixed(2)}`);
+            
+            // Clear inputs after trade
+            marginInput.value = '';
+            priceInput.value = '';
+        }
+
+        buyButton.addEventListener('click', () => executeTrade('BUY'));
+        sellButton.addEventListener('click', () => executeTrade('SELL'));
+
+        // Auto-fill current price when clicking on price input
+        priceInput.addEventListener('focus', () => {
+            if (!priceInput.value) {
+                priceInput.value = basePrice.toFixed(2);
+            }
+        });
+
+        // Real-time validation
+        marginInput.addEventListener('input', (e) => {
+            if (e.target.value < 0) e.target.value = 0;
+        });
+
+        priceInput.addEventListener('input', (e) => {
+            if (e.target.value < 0) e.target.value = 0;
+        });
     </script>
-  </div>
-  <!-- TradingView Widget END -->
 </body>
 </html>
